@@ -158,27 +158,17 @@
 
         <div class="row">
             <div class="col-lg-12">
-                <button type="button" class="btn btn-primary" onclick="montarTabelas()">Tabelas</button>
+                <button type="button" class="btn btn-primary" onclick="montarDadosD()">Dados Discreta</button>
+                <button type="button" class="btn btn-primary" onclick="montarDadosC()">Dados Continua</button>
             </div>
         </div>
 
         <div class="row"> <br></div>
-        <div id="geralTabelas"></div>
+        <div id="dadosD"></div>
+        <div id="dadosC"></div>
     </div>
 
     <script>
-        function validaEntrada(num) {
-            //função para validar entrada apenas de numeros e ;
-            var er = /[^0-9;.]/;
-            er.lastIndex = 0;
-            var campo = num;
-            if (er.test(campo.value)) {
-                campo.value = "";
-            } else if (campo == ",") {
-                campo.value = ".";
-            }
-        }
-
         function setPopulacao() {
             v_populacao = parseFloat(document.getElementById("populacao").value);
         }
@@ -346,6 +336,244 @@
             document.getElementById("Sistematica").innerHTML = insert;
         }
 
+        function montarDadosD() {
+            //tabela discreta
+            insert = "<div class='painel'>";
+            insert += "<div class='row'> <div class='col-lg-1'> </div> <div class='col-lg-10' id='tabelaDiscreta'> </div> </div>";
+            //tabela valores
+            insert += "<div class='row'> <div class='col-lg-1'> </div> <div class='col-lg-10' id='tabelaValoresD'> </div> </div>";
+            //tabela moda
+            insert += "<div class='row'> <div class='col-lg-1'> </div> <div class='col-lg-10' id='tabelaModaDisc'> </div> </div>";
+            // tabeça desvioPadrao
+            insert += "<div class='row'> <div class='col-lg-1'> </div> <div class='col-lg-10' id='DesvioPadraoD'> </div> </div>";
+            insert += "</div>";
+
+            //insere base html
+            document.getElementById("dadosD").innerHTML = insert;
+
+            //calcula a tabela, monta o html e insere com o innerhtml
+            v_tabelaDiscreta = tabelaQuantDiscreta(v_valores);
+            var titulos = ["Variavel", "Frequencia", "FR%", "F", "F%"];
+            insert = "<h2 class='text-center'> Variável Quantitatva Discreta </h2><h3> Tabela Discreta </h3>";
+            insert += "<table class='table table-striped' ><tr>";
+            for (var i = 0; i < titulos.length; i++) {
+                insert += "<th>" + titulos[i] + "</th>";
+            }
+            insert += "</tr>";
+            for (var i = 0; i < v_tabelaDiscreta.length; i++) {
+                insert += "<tr>";
+                for (var j = 0; j < v_tabelaDiscreta[i].length; j++) {
+                    insert += "<td>" + v_tabelaDiscreta[i][j] + "</td>";
+                }
+                insert += "</tr>";
+            }
+            insert += "</table>";
+            document.getElementById("tabelaDiscreta").innerHTML = insert;
+
+            //calcula a media
+            mediaPonderada = mediaPonderadaVarDisc(v_tabelaDiscreta);
+
+            //calcula a mediana
+            mediana = medianaVarDisc(v_valores);
+
+            //calcula a variancia
+            variancia1 = variancia(v_tabelaDiscreta, mediaPonderada, rdPopulacao.checked);
+
+            //monta tabela valores
+            var titulos = ["Média Ponderada", "Mediana", "Variancia"];
+            insert = "<h3> Valores </h3>";
+            insert += "<div class='col-lg-6'><table class=\"table table-striped\" ><tr>";
+            for (var i = 0; i < titulos.length; i++) {
+                insert += "<th>" + titulos[i] + "</th>";
+            }
+            insert += "</tr><tr>";
+            insert += "<td>" + mediaPonderada + "</td>";
+            insert += "<td>" + mediana + "</td>";
+            insert += "<td>" + variancia1 + "</td>";
+            insert += "</tr></table></div>";
+            document.getElementById("tabelaValoresD").innerHTML = insert;
+
+            //calcula a moda, monta a tabela e insere o html
+            moda = modaVarDis(v_tabelaDiscreta);
+            insert = "";
+            var titulos = ["Variavel", "Frequencia"];
+            insert = "<h3> Moda </h3>";
+            insert += " <div class='col-lg-4'> <table class='table table-striped'><tr>";
+            for (var i = 0; i < titulos.length; i++) {
+                insert += "<th>" + titulos[i] + "</th>";
+            }
+            insert += "</tr>";
+            for (var i = 0; i < moda.length; i++) {
+                insert += "<tr>";
+                for (var j = 0; j < moda[i].length; j++) {
+                    insert += "<td>" + moda[i][j] + "</td>";
+                }
+                insert += "</tr>";
+            }
+            insert += "</table> </div>";
+            document.getElementById("tabelaModaDisc").innerHTML = insert;
+
+            //calcula o desvio padrão, monta a tabela e insere o html
+            desvPadrao = DesvioPadrao(variancia1, mediaPonderada);
+            var titulos = ["Valor", "Percentual"];
+            insert = "<h3> Desvio Padrão </h3>";
+            insert += "<div class='col-lg-4'><table class=\"table table-striped\" ><tr>";
+            for (var i = 0; i < titulos.length; i++) {
+                insert += "<th>" + titulos[i] + "</th>";
+            }
+            insert += "</tr>";
+            for (var i = 0; i < desvPadrao.length; i++) {
+                insert += "<tr>";
+                for (var j = 0; j < desvPadrao[i].length; j++) {
+                    insert += "<td>" + desvPadrao[i][j] + "</td>";
+                }
+                insert += "</tr>";
+            }
+            insert += "</table></div>";
+            document.getElementById("DesvioPadraoD").innerHTML = insert;
+
+        }
+
+        function montarDadosC() {
+            //tabela continua
+            insert = "<div class='painel'>";
+            insert += "<div class='row'> <div class='col-lg-1'> </div> <div class='col-lg-10' id='tabelaContinua'> </div> </div>";
+            //tabela valores
+            insert += "<div class='row'> <div class='col-lg-1'> </div> <div class='col-lg-10' id='tabelaValoresC'> </div> </div>";
+            //tabela moda
+            insert += "<div class='row'> <div class='col-lg-1'> </div> <div class='col-lg-10' id='tabelaModaC'> </div> </div>";
+            // tabeça desvioPadrao
+            insert += "<div class='row'> <div class='col-lg-1'> </div> <div class='col-lg-10' id='DesvioPadraoC'> </div> </div>";
+            insert += "</div>";
+
+            //insere base html
+            document.getElementById("dadosC").innerHTML = insert;
+
+            //calcula a tabela continua, monta o html e insere
+            tabelaContinua = tabelaQuantContinua(v_valores);
+            titulos = ["Classes", "Intervalo de Classes", "Frequencia Simples", "FR%", "F", "F%", "(min + max)/2"];
+            insert = "<h2 class='text-center'> Variável Quantitatva Continua </h2><h3> Tabela Continua </h3>";
+            insert += "<table  class='table table-striped' ><thead>";
+            for (var i = 0; i < titulos.length; i++) {
+                insert += "<th>" + titulos[i] + "</th>";
+            }
+            insert += "</thead><tbody>";
+            for (var i = 0; i < tabelaContinua.length; i++) {
+                insert += "<tr>";
+                for (var j = 0; j < tabelaContinua[i].length; j++) {
+                    if (j == 1) {
+                        insert += "<td>" + tabelaContinua[i][1] + tabelaContinua[i][2] + tabelaContinua[i][3] + "</td>";
+                        j += 2;
+                    } else {
+                        insert += "<td>" + tabelaContinua[i][j] + "</td>";
+                    }
+                }
+                insert += "</tr>";
+            }
+            insert += "</tbody></table>";
+            document.getElementById("tabelaContinua").innerHTML = insert;
+
+            //calcula media, mediana, variancia, e monta tabela
+            mediaPonderada2 = mediaVarContinua(tabelaContinua, v_valores.length);
+            mediana2 = medianaVarCont(tabelaContinua, v_valores);
+            variancia2 = variancia(v_tabelaDiscreta, mediaPonderada2, rdPopulacao.checked);
+
+            //monta tabela valores
+            var titulos = ["Média Ponderada", "Mediana", "Variancia"];
+            insert = "<h3> Valores </h3>";
+            insert += "<div class='col-lg-6'><table class=\"table table-striped\" ><tr>";
+            for (var i = 0; i < titulos.length; i++) {
+                insert += "<th>" + titulos[i] + "</th>";
+            }
+            insert += "</tr><tr>";
+            insert += "<td>" + mediaPonderada2 + "</td>";
+            insert += "<td>" + mediana2 + "</td>";
+            insert += "<td>" + variancia2 + "</td>";
+            insert += "</tr></table></div>";
+            document.getElementById("tabelaValoresC").innerHTML = insert;
+
+            //calcula modas e monta tabelas
+            moda2 = modaConvVarCont(tabelaContinua);
+            modaK = modaKing(tabelaContinua);
+            modaCz = modaCzuber(tabelaContinua);
+            modaP = modaPearson(mediana2, mediaPonderada2);
+
+            //calcula as modas, monta as tabelas e insere o html
+            var titulos = ["Classe", "Frequencia", "Ponto Médio"];
+            insert = "<h3> Moda Convencional </h3>";
+            insert += "<div class='row'> <div class='col-lg-4'> <table class='table table-striped'><tr>";
+            for (var i = 0; i < titulos.length; i++) {
+                insert += "<th>" + titulos[i] + "</th>";
+            }
+            insert += "</tr>";
+            for (var i = 0; i < moda2.length; i++) {
+                insert += "<tr>";
+                for (var j = 0; j < moda2[i].length; j++) {
+                    insert += "<td>" + moda2[i][j] + "</td>";
+                }
+                insert += "</tr>";
+            }
+            insert += "</table> </div></div>";
+
+            var titulos = ["Classe", "Frequencia", "Calculo"];
+            insert += "<h3> Moda King </h3>";
+            insert += "<div class='row'> <div class='col-lg-4'> <table class='table table-striped'><tr>";
+            for (var i = 0; i < titulos.length; i++) {
+                insert += "<th>" + titulos[i] + "</th>";
+            }
+            insert += "</tr>";
+            for (var i = 0; i < modaK.length; i++) {
+                insert += "<tr>";
+                for (var j = 0; j < modaK[i].length; j++) {
+                    insert += "<td>" + modaK[i][j] + "</td>";
+                }
+                insert += "</tr>";
+            }
+            insert += "</table> </div></div>";
+
+            insert += "<h3> Moda Czuber </h3>";
+            insert += "<div class='row'> <div class='col-lg-4'> <table class='table table-striped'><tr>";
+            for (var i = 0; i < titulos.length; i++) {
+                insert += "<th>" + titulos[i] + "</th>";
+            }
+            insert += "</tr>";
+            for (var i = 0; i < modaCz.length; i++) {
+                insert += "<tr>";
+                for (var j = 0; j < modaCz[i].length; j++) {
+                    insert += "<td>" + modaCz[i][j] + "</td>";
+                }
+                insert += "</tr>";
+            }
+            insert += "</table> </div></div>";
+
+            insert += "<h3> Moda Pearson </h3>";
+            insert += "<div class='row'><div class='col-lg-4'> <table class='table table-striped'><tr>";
+            insert += "<th> Calculo</th></tr>";
+            insert += "<tr><td>" + modaP + "</td></tr>";
+            insert += "</table> </div></div>";
+
+            document.getElementById("tabelaModaC").innerHTML = insert;
+
+            //calcula desvio padrão e monta tabela
+            desvPadrao2 = DesvioPadrao(variancia2, mediaPonderada2);
+            var titulos = ["Valor", "Percentual"];
+            insert = "<h3> Desvio Padrão </h3>";
+            insert += " <div class='row'><div class='col-lg-4'><table class=\"table table-striped\" ><tr>";
+            for (var i = 0; i < titulos.length; i++) {
+                insert += "<th>" + titulos[i] + "</th>";
+            }
+            insert += "</tr>";
+            for (var i = 0; i < desvPadrao2.length; i++) {
+                insert += "<tr>";
+                for (var j = 0; j < desvPadrao2[i].length; j++) {
+                    insert += "<td>" + desvPadrao2[i][j] + "</td>";
+                }
+                insert += "</tr>";
+            }
+            insert += "</table></div></div>";
+            document.getElementById("DesvioPadraoC").innerHTML = insert;
+        }
+
         function montarTabelas() {
             //tabela discreta
             insert = "<div class='painel'>";
@@ -367,9 +595,12 @@
             // tabeça desvioPadrao
             insert += "<div class='row'> <div class='col-lg-1'> </div> <div class='col-lg-10' id='DesvioPadraoC'> </div> </div>";
             insert += "</div>";
+
+
             //insere base html
             document.getElementById("geralTabelas").innerHTML = insert;
 
+            //
             //calcula a tabela, monta o html e insere com o innerhtml
             v_tabelaDiscreta = tabelaQuantDiscreta(v_valores);
             var titulos = ["Variavel", "Frequencia", "FR%", "F", "F%"];
