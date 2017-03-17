@@ -338,8 +338,7 @@ function medianaVarCont(tabela, populacao) {
         for (var i = -1; i < 2; i++) {
             if ((amplitude % (raiz + i)) == 0) {
                 achou = true;
-                classe = (i + raiz);
-                intervaloDeClasse = (amplitude / classe);
+                intervaloDeClasse = (amplitude / (i + raiz));
                 break;
             }
         }
@@ -583,6 +582,8 @@ function getValores() {
             v_valores_str += ";" + v_valores[i];
         }
     }
+    v_tabelaDiscreta.splice(0, v_tabelaDiscreta.length);
+    v_tabelaContinua.splice(0, v_tabelaContinua.length);
     document.getElementById("valores").value = v_valores_str;
 }
 

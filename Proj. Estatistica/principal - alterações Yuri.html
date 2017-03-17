@@ -9,7 +9,6 @@
     <link href="css/font-awesome.min.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="css/sweetalert.css">
 
-
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="js/sweetalert.min.js"></script>
@@ -25,8 +24,13 @@
         v_valorExtrato = 0;
         v_valoresExtrato = new Array();
         v_valoresExtrato_str = "";
+
+        //arrays de verificação
+        v_extratificada = new Array();
         v_aleatoriaSimples = new Array();
+        v_sistematica = new Array();
         v_tabelaDiscreta = new Array();
+        v_tabelaContinua = new Array();
     </script>
     <style>
         .painel {
@@ -263,7 +267,7 @@
 
             <div class="painel">
                 <!--painel discreta-->
-                <button id="btnD" type="button" class='btn btn-info btn-sm btn-block' data-target="#collapseDiscreta"> Dados Discreta</button>
+                <button type="button" class='btn btn-info btn-sm btn-block' data-target="#collapseDiscreta" data-toggle="collapse"> Dados Discreta</button>
                 <div id="collapseDiscreta" class="collapse">
 
                     <div class='row'><br></div>
@@ -271,7 +275,7 @@
                     <div class='row'>
                         <div class='col-lg-1'></div>
                         <div class="col-lg-10">
-                            <button type='button' class='btn btn-primary' onclick="montaTabelaD()"> Tabela</button>
+                            <button type='button' class='btn btn-primary' id="btnD2"> Tabela</button>
                             <button type='button' class='btn btn-primary' onclick="montaValoresD()"> Valores</button>
                             <button type='button' class='btn btn-primary' onclick="montaModaD()"> Moda</button>
                             <button type='button' class='btn btn-primary' onclick="montaDesvioD()"> Desvio Padrão</button>
@@ -290,8 +294,7 @@
 
             <div class="painel">
                 <!--painel continua-->
-                <button type='button' class='btn btn-info btn-sm btn-block' id="btnC" data-target="#collapseContinua"> Dados Continua</button>
-
+                <button type='button' class='btn btn-info btn-sm btn-block' data-target="#collapseContinua" data-toggle="collapse"> Dados Continua</button>
                 <div id="collapseContinua" class="collapse">
 
                     <div class='row'><br></div>
@@ -299,7 +302,7 @@
                     <div class='row'>
                         <div class='col-lg-1'></div>
                         <div class="col-lg-10">
-                            <button type='button' class='btn btn-primary' onclick="montaTabelaC()"> Tabela</button>
+                            <button type='button' class='btn btn-primary' id="btnC2"> Tabela</button>
                             <button type='button' class='btn btn-primary' onclick="montaValoresC()"> Valores</button>
                             <button type='button' class='btn btn-primary' onclick="montaModaC()"> Moda</button>
                             <button type='button' class='btn btn-primary' onclick="montaDesvioC()"> Desvio Padrão</button>
@@ -319,46 +322,15 @@
     </div>
     <script>
         $(function() {
-            $('#btnD').on('click', montaTabelaD.bind(this));
+            $('#btnD2').on('click', montaTabelaD.bind(this));
             $('#btnAmostra').on('click', getAmostra.bind(this));
             $('#btnExtrat').on('click', getExtratificadaProp.bind(this));
-            $('#btnC').on('click', montaTabelaC.bind(this));
+            $('#btnC2').on('click', montaTabelaC.bind(this));
 
             this.divDiscreta = $('#collapseDiscreta');
             this.divAmostra = $("#collapseAmostra");
             this.divExt = $("#collapseTabExtratificada");
             this.divContinua = $('#collapseContinua');
-
-
-            function montaTabelaD() {
-                if (!(v_valores.length > 0)) {
-                    swal("Erro", "Favor informar valores de Variavel!", "error");
-                    this.divDiscreta.collapse('hide');
-                } else {
-                    this.divDiscreta.collapse('show');
-                    //calcula a tabela, monta o html e insere com o innerhtml 
-                    v_tabelaDiscreta = tabelaQuantDiscreta(v_valores);
-                    var titulos = ["Variavel", "Frequencia", "FR%", "F", "F%"];
-                    insert = "<h3> Tabela Discreta </h3>";
-                    insert += "<table class='table table-striped'><tr>";
-                    for (var i = 0; i < titulos.length; i++) {
-                        insert += "<th>" + titulos[i] +
-                            "</th>";
-                    }
-                    insert += "</tr>";
-                    for (var i = 0; i < v_tabelaDiscreta.length; i++) {
-                        insert += "<tr>";
-                        for (var j = 0; j < v_tabelaDiscreta[i].length; j++) {
-                            insert += "<td>" + v_tabelaDiscreta[i][j] + "</td>";
-                        }
-                        insert += "</tr>";
-                    }
-                    insert
-                        += "</table>";
-                    document.getElementById("tabelaDiscreta").innerHTML = insert;
-                }
-            }
-
         });
 
         function getAmostra() {
@@ -369,47 +341,57 @@
                 this.divAmostra.collapse('show');
                 v_amostra = calculaAmostraErro(v_populacao, v_erro);
                 document.getElementById("Amostra").value = v_amostra;
+
+                //zera as variaveis para forçar calcular novamente
+                v_aleatoriaSimples.splice(0, v_aleatoriaSimples.length);
+                v_sistematica.splice(0, v_sistematica.length);
+                v_extratificada.splice(0, v_extratificada.length);
             }
         }
 
         function getAleatoriaSimples() {
-            v_aleatoriaSimples = aleatoriaSimples(v_populacao, v_amostra);
-            var col = 10;
-            insert = " <div class = 'row'><div class = 'col-lg-1'> </div> <div class 'col-lg-11'><h3> Tabela de Aleatórios </h3> </div> </div>";
-            insert += " <table class = \"table table-striped\"> <tr> ";
+            //verifica se ja foi gerado
+            if (!(v_aleatoriaSimples.length > 0)) {
+                v_aleatoriaSimples = aleatoriaSimples(v_populacao, v_amostra);
+                var col = 10;
+                insert = " <div class = 'row'><div class = 'col-lg-1'> </div> <div class 'col-lg-11'><h3> Tabela de Aleatórios </h3> </div> </div>";
+                insert += " <table class = \"table table-striped\"> <tr> ";
 
-            for (var i = 0; i < col; i++) {
-                insert += "<th>Aleatório</th>";
-            }
-            insert += "</tr>";
-            for (var i = 0; i < v_aleatoriaSimples.length; i++) {
-                insert += "<tr>";
-                for (var j = 0; j < col; j++) {
-                    insert += "<td>" + v_aleatoriaSimples[i + j] + "</td>";
+                for (var i = 0; i < col; i++) {
+                    insert += "<th>Aleatório</th>";
                 }
                 insert += "</tr>";
-                i += (col - 1);
+                for (var i = 0; i < v_aleatoriaSimples.length; i++) {
+                    insert += "<tr>";
+                    for (var j = 0; j < col; j++) {
+                        insert += "<td>" + v_aleatoriaSimples[i + j] + "</td>";
+                    }
+                    insert += "</tr>";
+                    i += (col - 1);
+                }
+                insert += "</table>";
+                document.getElementById("AleatoriaSimples").innerHTML = insert;
             }
-            insert += "</table>";
-            document.getElementById("AleatoriaSimples").innerHTML = insert;
         }
 
         function getExtratificadaProp() {
-            insert = "";
             if (validaExtratos(v_valoresExtrato, v_populacao)) {
-                this.divExt.collapse('show');
-                v_proporcao = propExtratos(v_valoresExtrato,
-                    v_populacao);
-                v_extratificada = extratificadaProp(v_proporcao, v_populacao, v_amostra);
-                insert += "<h3> Tabela de Proporções</h3>"
-                insert += "<table class='table table-striped'> <tr> ";
-                insert += " <th> Extrato </th><th>Percentual</th> <th> Quantidade </th>";
-                insert += "</tr>";
-                for (var i = 0; i < v_proporcao.length; i++) {
-                    insert += "<tr><td>" + v_extratificada[i][0] + "</td><td>" + v_extratificada[i][1] + "</td><td>" + v_extratificada[i][2] + "</td></tr>";
+                //verifica se ja foi gerado
+                if (!(v_extratificada.length > 0)) {
+                    this.divExt.collapse('show');
+                    v_proporcao = propExtratos(v_valoresExtrato,
+                        v_populacao);
+                    v_extratificada = extratificadaProp(v_proporcao, v_populacao, v_amostra);
+                    insert = "<h3> Tabela de Proporções</h3>"
+                    insert += "<table class='table table-striped'> <tr> ";
+                    insert += " <th> Extrato </th><th>Percentual</th> <th> Quantidade </th>";
+                    insert += "</tr>";
+                    for (var i = 0; i < v_proporcao.length; i++) {
+                        insert += "<tr><td>" + v_extratificada[i][0] + "</td><td>" + v_extratificada[i][1] + "</td><td>" + v_extratificada[i][2] + "</td></tr>";
+                    }
+                    insert += "</table>";
+                    document.getElementById("ExtratificadaProp").innerHTML = insert;
                 }
-                insert += "</table>";
-                document.getElementById("ExtratificadaProp").innerHTML = insert;
             } else {
                 this.divExt.collapse('hide');
                 swal("Erro", "Total dos Extratos não bate com a população!", "error");
@@ -417,27 +399,60 @@
         }
 
         function getSistematica() {
-            v_sistematica = sistematica(v_amostra, v_populacao);
-            var col = 10;
-            insert = "<h3> Tabela Sistematica</h3>";
-            insert += "<table class='table table-striped'> <tr> ";
-            for (var i = 0; i < col; i++) {
-                insert += " <th> Aleatório </th>";
-            }
-            insert += "</tr> ";
-            for (var i = 0; i < v_sistematica.length; i++) {
-                insert += "<tr>";
-                for (var j = 0; j < col; j++) {
-                    insert += "<td>" + v_sistematica[i + j] + "</td>";
+            if (!(v_sistematica.length > 0)) {
+                v_sistematica = sistematica(v_amostra, v_populacao);
+                var col = 10;
+                insert = "<h3> Tabela Sistematica</h3>";
+                insert += "<table class='table table-striped'> <tr> ";
+                for (var i = 0; i < col; i++) {
+                    insert += " <th> Aleatório </th>";
                 }
-                insert += "</tr>";
-                i += (col - 1);
+                insert += "</tr> ";
+                for (var i = 0; i < v_sistematica.length; i++) {
+                    insert += "<tr>";
+                    for (var j = 0; j < col; j++) {
+                        insert += "<td>" + v_sistematica[i + j] + "</td>";
+                    }
+                    insert += "</tr>";
+                    i += (col - 1);
+                }
+                insert += "</table>";
+                document.getElementById("Sistematica").innerHTML = insert;
             }
-            insert += "</table>";
-            document.getElementById("Sistematica").innerHTML = insert;
         }
 
+        function montaTabelaD() {
+            //verifica se ja foi gerado
+            if (!(v_valores.length > 0)) {
+                swal("Erro", "Favor informar valores de Variavel!", "error");
+                this.divDiscreta.collapse('hide');
+            } else {
+                if (!(v_tabelaDiscreta.length > 0)) {
+                    this.divDiscreta.collapse('show');
 
+                    //calcula a tabela, monta o html e insere com o innerhtml 
+                    v_tabelaDiscreta = tabelaQuantDiscreta(v_valores);
+                    var titulos = ["Variavel", "Frequencia", "FR%", "F", "F%"];
+                    inserttabD = "<h3> Tabela Discreta </h3>";
+                    inserttabD += "<table class='table table-striped'><tr>";
+                    for (var i = 0; i < titulos.length; i++) {
+                        inserttabD += "<th>" + titulos[i] +
+                            "</th>";
+                    }
+                    inserttabD += "</tr>";
+                    for (var i = 0; i < v_tabelaDiscreta.length; i++) {
+                        inserttabD += "<tr>";
+                        for (var j = 0; j < v_tabelaDiscreta[i].length; j++) {
+                            inserttabD += "<td>" + v_tabelaDiscreta[i][j] + "</td>";
+                        }
+                        inserttabD += "</tr>";
+                    }
+                    inserttabD
+                        += "</table>";
+                }
+                document.getElementById("tabelaDiscreta").innerHTML = inserttabD;
+            }
+        }
 
         function montaValoresD() {
             //calcula a media 
@@ -513,39 +528,44 @@
                 swal("Erro", "Favor informar valores de Variavel!", "error");
                 this.divContinua.collapse('hide');
             } else {
-                this.divContinua.collapse('show');
-                //calcula a tabela continua, monta o html e insere 
-                tabelaContinua = tabelaQuantContinua(v_valores);
-                titulos = ["Classes", "Intervalo de Classes", "Frequencia Simples", "FR%", "F", "F%", "(min + max)/2"];
-                insert = "<h2 class='text-center'> Variável Quantitatva Continua </h2><h3> Tabela Continua </h3>";
-                insert += "<table  class='table table-striped'><thead>";
-                for (var i = 0; i < titulos.length; i++) {
-                    insert += "<th>" + titulos[i] + "</th>";
-                }
-                insert += "</thead><tbody>";
-                for (var i = 0; i < tabelaContinua.length; i++) {
-                    insert += "<tr>";
-                    for (var j = 0; j < tabelaContinua[i].length; j++) {
-                        if (j == 1) {
-                            insert += "<td>" + tabelaContinua[i][1] + tabelaContinua[i][2] + tabelaContinua[i][3] + "</td>";
-                            j += 2;
-                        } else {
-                            insert += "<td>" + tabelaContinua[i][j] + "</td>";
-                        }
+                if (!(v_tabelaContinua.length > 0)) {
+                    this.divContinua.collapse('show');
+                    //calcula a tabela continua, monta o html e insere 
+
+                    v_tabelaContinua = tabelaQuantContinua(v_valores);
+                    titulos = ["Classes", "Intervalo de Classes", "Frequencia Simples", "FR%", "F", "F%", "(min + max)/2"];
+                    inserttabC = "<h3> Tabela Continua </h3>";
+                    inserttabC += "<table  class='table table-striped'><thead>";
+                    for (var i = 0; i < titulos.length; i++) {
+                        inserttabC += "<th>" + titulos[i] + "</th>";
                     }
-                    insert
-                        += "</tr>";
+                    inserttabC += "</thead><tbody>";
+                    for (var i = 0; i < v_tabelaContinua.length; i++) {
+                        inserttabC += "<tr>";
+                        for (var j = 0; j < v_tabelaContinua[i].length; j++) {
+                            if (j == 1) {
+                                inserttabC += "<td>" + v_tabelaContinua[i][1] + v_tabelaContinua[i][2] + v_tabelaContinua[i][3] + "</td>";
+                                j += 2;
+                            } else {
+                                inserttabC += "<td>" + v_tabelaContinua[i][j] + "</td>";
+                            }
+                        }
+                        inserttabC += "</tr>";
+                    }
+                    inserttabC += "</tbody></table>";
+                    document.getElementById("tabelaContinua").innerHTML = inserttabC;
                 }
-                insert += "</tbody></table>";
-                document.getElementById("tabelaContinua").innerHTML = insert;
             }
         }
 
         function montaValoresC() {
             //calcula media, mediana, variancia, e monta tabela 
-            mediaPonderada2 = mediaVarContinua(tabelaContinua, v_valores.length);
-            mediana2 = medianaVarCont(tabelaContinua, v_valores);
+            mediaPonderada2 = mediaVarContinua(v_tabelaContinua, v_valores.length);
+            mediana2 = medianaVarCont(v_tabelaContinua, v_valores);
+
+            v_tabelaDiscreta = tabelaQuantDiscreta(v_valores);
             variancia2 = variancia(v_tabelaDiscreta, mediaPonderada2, rdPopulacao.checked);
+            v_tabelaDiscreta.splice(0, v_tabelaDiscreta.length);
 
             //monta tabela valores 
             var titulos = ["Média Ponderada", "Mediana", "Variancia"];
@@ -564,9 +584,9 @@
 
         function montaModaC() {
             //calcula modas e monta tabelas 
-            moda2 = modaConvVarCont(tabelaContinua);
-            modaK = modaKing(tabelaContinua);
-            modaCz = modaCzuber(tabelaContinua);
+            moda2 = modaConvVarCont(v_tabelaContinua);
+            modaK = modaKing(v_tabelaContinua);
+            modaCz = modaCzuber(v_tabelaContinua);
             modaP = modaPearson(mediana2, mediaPonderada2);
 
             //calcula as modas, monta as tabelas e insere o html 
