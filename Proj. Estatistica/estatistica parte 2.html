@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+
+    <script>
+        var maiorQ = 0;
+        var menorQ = 0;
+
+        var media = 0;
+        var desvioPadrao = 0;
+        var perc = 0;
+        var tipo = 0;
+
+        //exemplo
+        media = 5.33;
+        desvioPadrao = 2.07;
+        maiorQ = 5;
+        menorQ = 6;
+        tipo = 2;
+
+
+        if (tipo == 0) { //maior que
+            perc = 1 - (valida(maiorQ, media, desvioPadrao));
+
+        } else if (tipo == 1) { //menor que
+            perc = (valida(menorQ, media, desvioPadrao));
+
+        } else { //entre
+            calculo1 = valida(maiorQ, media, desvioPadrao);
+            calculo2 = valida(menorQ, media, desvioPadrao);
+
+            perc = (calculo1 - calculo2);
+
+            if (perc < 0) {
+                perc *= -1;
+            }
+
+        }
+        console.log("O percentual é: " + perc * 100);
+
+        function calculaDistNormal(num) {
+            var T = 1 / (1 + .2316419 * Math.abs(num));
+            var D = 0.3989423 * Math.exp(-num * num / 2);
+            var Prob = D * T * (.3193815 + T * (-0.3565638 + T * (1.781478 + T * (-1.821256 + T * 1.330274))));
+            if (num > 0) {
+                Prob = 1 - Prob;
+            }
+            return Prob;
+        }
+
+        function valida(p_numeroZ, p_media, p_desvioPadrao) {
+            with(Math) {
+                if (p_desvioPadrao < 0) {
+                    alert("O Desvio Padrão não pode ser negativo.")
+                } else if (p_desvioPadrao == 0) {
+                    if (p_numeroZ < p_media) {
+                        Prob = 0;
+                    } else {
+                        Prob = 1;
+                    }
+                } else {
+                    Prob = calculaDistNormal((p_numeroZ - p_media) / p_desvioPadrao);
+                    Prob = round(10000 * Prob) / 10000;
+                }
+                return Prob;
+            }
+        }
+    </script>
+</body>
+
+
+
+</html>
