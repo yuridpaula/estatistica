@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/font-awesome.min.css" rel="stylesheet">
+    <!--<link href="css/font-awesome.min.css" rel="stylesheet">!-->
     <link rel="stylesheet" type="text/css" href="css/sweetalert.css">
 
 
@@ -337,9 +337,9 @@
         <label>Menor que : </label>
         <input type="text" name="menorque" placeholder="Menor que" id="dn_menor">
         <br>
-        <input type="radio" id="dn_radio" name="optradio" value="0"> Maior
-        <input type="radio" id="dn_radio" name="optradio" value="1"> Menor
-        <input type="radio" id="dn_radio" name="optradio" valur="2"> Entre
+        <input type="radio" id="dn_radio" name="dn_radio" value="0"> Maior
+        <input type="radio" id="dn_radio" name="dn_radio" value="1"> Menor
+        <input type="radio" id="dn_radio" name="dn_radio" value="2"> Entre
         <br>
         <button onclick="calculaDistribuicaoNormal()">Calcular</button>
         <div id="resultadoDN"></div>
@@ -367,8 +367,8 @@
         <label>X</label>
         <input type="text" name="x" placeholder="X" id="dp_x">
         <br>
-        <input type="radio" name="dp" id="dp_tipo" value="0">Valor Especifico
-        <input type="radio" name="dp" id="dp_tipo" value="1">0 - Até Valor Especifico
+        <input type="radio" name="dp_radio" id="dp_tipo" value="0">Valor Especifico
+        <input type="radio" name="dp_radio" id="dp_tipo" value="1">0 - Até Valor Especifico
         <br>
         <button onclick="calculaDistribuicaoPoisson()">Calcular</button>
         <div id="resultadoDP"></div>
@@ -395,7 +395,7 @@
         <label>Intervalo de Confiança</label>
         <input type="text" name="intervalo_confianca" id="ic_intervalo">
 
-        <button>Calcular</button>
+        <button onclick="calculaIntervaloConfianca()">Calcular</button>
         <div id="resultadoIC"></div>
     </div>
 
@@ -422,7 +422,7 @@
         <input type="text" name="Y" id="cr_y">
         <button onclick="pushRow()">Adicionar na Tabela</button>
         <br>
-        <button onclick="calcularCorrelacao()">Mostrar / Montar Tabela</button>
+        <button onclick="calcularCorrelacao()">Calcular</button>
         <div id="resultadoCR"></div>
     </div>
 
@@ -845,7 +845,7 @@
                 return 0.5000;
             }
 
-            return table[index][column];;
+            return table[index][column];
         }
 
         function getParams(num) {
@@ -921,11 +921,16 @@
 
         function calculaDistribuicaoNormal() {
 
-            var media = document.getElementById("dn_media").value;
-            var desvioPadrao = document.getElementById("dn_desvio_padrao").value;
-            var maiorQ = document.getElementById("dn_maior").Value;
-            var menorQ = document.getElementById("dn_menor").Value;
-            var tipo = document.getElementById("dn_radio").Value;
+            var media = parseFloat(document.getElementById("dn_media").value);
+            var desvioPadrao = parseFloat(document.getElementById("dn_desvio_padrao").value);
+            var maiorQ = parseFloat(document.getElementById("dn_maior").value);
+            var menorQ = parseFloat(document.getElementById("dn_menor").value);
+            var tipo = "";
+            $('input:radio[name=dn_radio]').each(function() {
+                //Verifica qual está selecionado
+                if ($(this).is(':checked'))
+                    tipo = parseInt($(this).val());
+            });
 
 
             if (tipo == 0) { //maior que
@@ -951,7 +956,7 @@
                     valor = (valor1 + valor2) * 100;
                 }
             }
-            document.getElementById("resultadoDN").innerHTML = valor;
+            document.getElementById("resultadoDN").innerHTML = Math.abs(valor);
         }
         //DISTRIBUIÇÃO BINOMIAL
 
@@ -961,22 +966,26 @@
 
             var Ni = document.getElementById("dp_ni").value;
             var x = document.getElementById("dp_x").value;
-            var tipo = document.getElementById("dp_tipo").value;
-
+            var tipo = "";
+            $('input:radio[name=dp_radio]').each(function() {
+                //Verifica qual está selecionado
+                if ($(this).is(':checked'))
+                    tipo = parseInt($(this).val());
+            });
             var total = 0;
 
             if (tipo == 0) { //valor especifico
-                total = distribuicaoPossion(Ni, x);
+                total = distribuicaoPoisson(Ni, x);
             } else { //de 0 a um valor especifico
                 for (var i = 0; i <= x; i++) {
-                    total += distribuicaoPossion(Ni, i);
+                    total += distribuicaoPoisson(Ni, i);
                 }
             }
             document.getElementById("resultadoDP").innerHTML = total * 100;
         }
 
 
-        function distribuicaoPossion(Ni, x) {
+        function distribuicaoPoisson(Ni, x) {
             return ((Math.pow(Ni, x) * Math.pow(2.71828, -Ni)) / fatorial(x));
         }
 
@@ -989,18 +998,18 @@
         }
 
         function calculaIntervaloConfianca() {
-            var n = document.getElementById("ic_populacao").value;
-            var p = document.getElementById("ic_populacao_total").value;
+            var n = parseFloat(document.getElementById("ic_populacao").value);
+            var p = parseFloat(document.getElementById("ic_populacao_total").value);
 
             var populacaoTotal = false;
 
-            if (p != null) {
+            if (!isNaN(p)) {
                 populacaoTotal = true;
             }
 
-            var media = document.getElementById("ic_media").value;
-            var desvioPadrao = document.getElementById("ic_desvio_padrao").value;
-            var intervaloConfianca = document.getElementById("ic_intervalo").value;
+            var media = parseFloat(document.getElementById("ic_media").value);
+            var desvioPadrao = parseFloat(document.getElementById("ic_desvio_padrao").value);
+            var intervaloConfianca = parseFloat(document.getElementById("ic_intervalo").value);
 
             var erroPadrao = getParams(intervaloConfianca / 2 / 100);
             //console.log("erro:" + erroPadrao);
@@ -1020,23 +1029,41 @@
         }
 
         var tabela = new Array();
+        var total0 = 0;
+        var total1 = 0;
+        var total2 = 0;
+        var total3 = 0;
+        var total4 = 0;
 
         function pushRow() {
-            tabela.push([document.getElementById("cr_x").value, document.getElementById("cr_x").value]);
+            tabela.push([parseFloat(document.getElementById("cr_x").value), parseFloat(document.getElementById("cr_y").value)]);
+            tabela[tabela.length - 1][2] = tabela[tabela.length - 1][0] * tabela[tabela.length - 1][1];
+            tabela[tabela.length - 1][3] = Math.pow(tabela[tabela.length - 1][0], 2);
+            tabela[tabela.length - 1][4] = Math.pow(tabela[tabela.length - 1][1], 2);
+            total0 += tabela[tabela.length - 1][0];
+            total1 += tabela[tabela.length - 1][1];
+            total2 += tabela[tabela.length - 1][2];
+            total3 += tabela[tabela.length - 1][3];
+            total4 += tabela[tabela.length - 1][4];
+            document.getElementById("resultadoCR").innerHTML = mostrarTabela();
         }
 
-        function calcularTabela() {
-            for (var i = 0; i < tabela.length; i++) {
-                tabela[i][2] = tabela[i][0] * tabela[i][1];
-                tabela[i][3] = Math.pow(tabela[i][0], 2);
-                tabela[i][4] = Math.pow(tabela[i][1], 2);
-                total0 += tabela[i][0];
-                total1 += tabela[i][1];
-                total2 += tabela[i][2];
-                total3 += tabela[i][3];
-                total4 += tabela[i][4];
+        function mostrarTabela() {
+            var titulos = ["x", "y", "x*y", "x²", "y²"];
+            insert = " <div class='row'><div class='col-lg-4'><table class='table table-striped'> <tr> ";
+            for (var i = 0; i < titulos.length; i++) {
+                insert += " <th> " + titulos[i] + "</th>";
             }
-            tabela.push([total0, total1, total2, total3, total4]);
+            insert += "</tr>";
+            for (var i = 0; i < tabela.length; i++) {
+                insert += "<tr>";
+                for (var j = 0; j < tabela[i].length; j++) {
+                    insert += "<td>" + tabela[i][j] + "</td>";
+                }
+                insert += "</tr>";
+            }
+            insert += "</table></div></div>";
+            return insert;
         }
 
         function calcularCorrelacao() {
@@ -1049,13 +1076,7 @@
 
             ultima linha é o total
             */
-            var total0 = 0;
-            var total1 = 0;
-            var total2 = 0;
-            var total3 = 0;
-            var total4 = 0;
-
-            calcularTabela();
+            tabela.push([total0, total1, total2, total3, total4]);
 
             var n = tabela.length - 1; //periodo
             var primeiraParte = n * tabela[tabela.length - 1][2] - (tabela[tabela.length - 1][0] * tabela[tabela.length - 1][1]);
@@ -1066,7 +1087,7 @@
             var a = ((n * tabela[tabela.length - 1][2]) - (tabela[tabela.length - 1][0] * tabela[tabela.length - 1][1])) / (n * tabela[tabela.length - 1][3] - Math.pow(tabela[tabela.length - 1][0], 2));
             var b = (tabela[tabela.length - 1][1] / n) - a * (tabela[tabela.length - 1][0] / n);
 
-            var retorno = '';
+            var retorno = mostrarTabela();
             if (result == 0) {
                 retorno += "Não há correlação!";
             } else if (result > 0) {
