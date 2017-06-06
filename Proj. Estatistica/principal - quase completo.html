@@ -350,17 +350,17 @@
     <div class="painel">
         <h2 align="center">Distribuição Binomial - Lista 6</h2>
         <br>
-        <label>p: </label>
-        <input type="text" name="p" placeholder="Media" id="db_p">
+        <label>Sucesso(p): </label>
+        <input type="text" name="p" id="db_p">
         <br>
-        <label>k: </label>
-        <input type="text" name="k" placeholder="Media" id="db_k">
+        <label>Evento(k): </label>
+        <input type="text" name="k" id="db_k">
         <br>
-        <label>q: </label>
-        <input type="text" name="q" placeholder="Media" id="db_q">
+        <label>Fracasso(q): </label>
+        <input type="text" name="q" id="db_q">
         <br>
-        <label>n: </label>
-        <input type="text" name="n" placeholder="Media" id="db_n">
+        <label>Tamanho da Amostra(n): </label>
+        <input type="text" name="n" id="db_n">
         <br>
         <button onclick="calculaDistribuicaoBinomial()">Calcular</button>
         <div id="resultadoBn"></div>
@@ -414,11 +414,21 @@
 
     <div class="row"><br></div>
     <div class="painel">
-        <h2 align="center"> - Lista 9</h2>
-        <br> A fazer
+        <h2 align="center">Distribuição Uniforme - Lista 9</h2>
         <br>
-        <button>Calcular</button>
+        <label>Menor</label>
+        <input type="text" placeholder="Menor" id="du_menor">
+        <br>
+        <label>Maior</label>
+        <input type="text" placeholder="Maior" id="du_maior">
+        <br>
+        <label>Interrogação</label>
+        <input type="text" placeholder="Interrogação" id="du_interrogacao">
+        <br>
+        <button onclick="calcularDistribuicaoUniforme()">Calcular</button>
         <div id="resultadolista9"></div>
+        <div id="resultadoDU"></div>
+
     </div>
 
     <!-- Lista 10 -->
@@ -1132,8 +1142,8 @@
         //CALCULO DE DISTRIBUIÇÃO UNIFORME
         function calcularDistribuicaoUniforme() {
 
-            maior = parseFloat($("#maior").val());
-            menor = parseFloat($("#menor").val());
+            maior = parseFloat(document.getElementById("du_maior").value);
+            menor = parseFloat(document.getElementById("du_menor").value);
 
 
             var media = ((maior + menor) / 2);
@@ -1141,24 +1151,18 @@
             var dp = Math.sqrt(varianca);
             var cv = (dp / media) * 100;
 
-            $("#media").text(media);
-            $("#varianca").text(varianca);
-            $("#dp").text(dp);
-            $("#cv").text(cv);
-            $("#calcProbabilidade").prop('disabled', false);
-        }
-
-        //CALCULAR A PROBABILIDADE
-        function calcularAProbabilidade() {
-            interrogacao = parseFloat($("#interrogacao").val());
+            var insert = "Média: " + media + "<br>";
+            insert += "Variancia: " + varianca + "<br>";
+            insert += "Desvio Padrão: " + dp + "<br>";
+            insert += "CV: " + cv + "<br>";
+            interrogacao = parseFloat(document.getElementById("du_interrogacao").value);
 
             var prob = ((1 / (maior - menor)) * interrogacao);
-            $("#probabilidade").text(prob);
-        }
+            insert += "Probabilidade: " + prob + "<br>";
 
-        function calcularDistribuicaoUnica() {
-            min = parseFloat($("#min").val());
-            max = parseFloat($("#max").val());
+            document.getElementById("resultadoDU").innerHTML = insert;
+
+
         }
     </script>
 
