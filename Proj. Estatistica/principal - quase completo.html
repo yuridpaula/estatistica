@@ -349,9 +349,20 @@
     <div class="row"><br></div>
     <div class="painel">
         <h2 align="center">Distribuição Binomial - Lista 6</h2>
-        <br> A fazer
         <br>
-        <button>Calcular</button>
+        <label>p: </label>
+        <input type="text" name="p" placeholder="Media" id="db_p">
+        <br>
+        <label>k: </label>
+        <input type="text" name="k" placeholder="Media" id="db_k">
+        <br>
+        <label>q: </label>
+        <input type="text" name="q" placeholder="Media" id="db_q">
+        <br>
+        <label>n: </label>
+        <input type="text" name="n" placeholder="Media" id="db_n">
+        <br>
+        <button onclick="calculaDistribuicaoBinomial()">Calcular</button>
         <div id="resultadoBn"></div>
     </div>
 
@@ -958,7 +969,18 @@
             }
             document.getElementById("resultadoDN").innerHTML = Math.abs(valor);
         }
+
         //DISTRIBUIÇÃO BINOMIAL
+        function calculaDistribuicaoBinomial() {
+            var p = parseFloat(document.getElementById("db_p").value);
+            var k = parseFloat(document.getElementById("db_k").value);
+            var q = parseFloat(document.getElementById("db_q").value);
+            var n = parseFloat(document.getElementById("db_n").value);
+
+            numero = (fatorial(n) / (fatorial(k) * (fatorial(n - k)))) * Math.pow(p, k) * Math.pow(q, (n - k));
+
+            document.getElementById("resultadoBn").innerHTML = (numero * 100);
+        }
 
         //DISTRIBUIÇÃO DE POISSON
 
@@ -990,7 +1012,9 @@
         }
 
         function fatorial(x) {
-            if (x <= 1) {
+            if (x < 0) {
+                return -1;
+            } else if (x == 0) {
                 return 1
             } else {
                 return x * fatorial(x - 1);
@@ -1098,6 +1122,43 @@
                 retorno += 'y = -(' + a + ') * x + (' + b + ')';
             }
             document.getElementById("resultadoCR").innerHTML = retorno;
+        }
+
+        //DISTRIBUIÇÃO UNIFORMA
+        var maior;
+        var menor;
+        var interrogacao;
+
+        //CALCULO DE DISTRIBUIÇÃO UNIFORME
+        function calcularDistribuicaoUniforme() {
+
+            maior = parseFloat($("#maior").val());
+            menor = parseFloat($("#menor").val());
+
+
+            var media = ((maior + menor) / 2);
+            var varianca = (Math.pow((maior - menor), 2) / 12);
+            var dp = Math.sqrt(varianca);
+            var cv = (dp / media) * 100;
+
+            $("#media").text(media);
+            $("#varianca").text(varianca);
+            $("#dp").text(dp);
+            $("#cv").text(cv);
+            $("#calcProbabilidade").prop('disabled', false);
+        }
+
+        //CALCULAR A PROBABILIDADE
+        function calcularAProbabilidade() {
+            interrogacao = parseFloat($("#interrogacao").val());
+
+            var prob = ((1 / (maior - menor)) * interrogacao);
+            $("#probabilidade").text(prob);
+        }
+
+        function calcularDistribuicaoUnica() {
+            min = parseFloat($("#min").val());
+            max = parseFloat($("#max").val());
         }
     </script>
 
