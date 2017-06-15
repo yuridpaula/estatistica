@@ -6,7 +6,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="css/bootstrap.min.css" rel="stylesheet">
-    <!--<link href="css/font-awesome.min.css" rel="stylesheet">!-->
     <link rel="stylesheet" type="text/css" href="css/sweetalert.css">
 
 
@@ -14,8 +13,12 @@
     <script src="js/bootstrap.min.js"></script>
     <script src="js/sweetalert.min.js"></script>
     <script src="js/fu.js"></script>
+    <script src="js/Chart/samples/utils.js"></script>
+    <script src="js/Chart/dist/Chart.bundle.js"></script>
+
 
     <script>
+        var color = Chart.helpers.color;
         v_populacao = 0;
         v_erro = 0;
         v_amostra = 0;
@@ -280,11 +283,14 @@
                             <button type='button' class='btn btn-primary' onclick="montaValoresD()"> Valores</button>
                             <button type='button' class='btn btn-primary' onclick="montaModaD()"> Moda</button>
                             <button type='button' class='btn btn-primary' onclick="montaDesvioD()"> Desvio Padrão</button>
+                            <button type='button' class='btn btn-primary' onclick="montaGraficoDiscreta()"> Gráfico</button>
                         </div>
                     </div>
                     <div class='row'>
                         <div class='col-lg-1'></div>
                         <div class='col-lg-10' id='tabelaDiscreta'></div>
+                        <canvas id="canvasDiscreta"></canvas>
+
                     </div>
 
                 </div>
@@ -422,8 +428,17 @@
         <label>Maior</label>
         <input type="text" placeholder="Maior" id="du_maior">
         <br>
-        <label>Interrogação</label>
-        <input type="text" placeholder="Interrogação" id="du_interrogacao">
+
+        <label>Maior que : </label>
+        <input type="text" name="maiorque2" placeholder="Maior que" id="du_maiorQ">
+        <label>Menor que : </label>
+        <input type="text" name="menorque2" placeholder="Menor que" id="du_menorQ">
+        <br>
+        <input type="radio" id="du_radio" name="du_radio" value="0"> Maior
+        <input type="radio" id="du_radio" name="du_radio" value="1"> Menor
+        <input type="radio" id="du_radio" name="du_radio" value="2"> Entre
+        <br>
+
         <br>
         <button onclick="calcularDistribuicaoUniforme()">Calcular</button>
         <div id="resultadolista9"></div>
@@ -1133,7 +1148,7 @@
             document.getElementById("resultadoCR").innerHTML = retorno;
         }
 
-        //DISTRIBUIÇÃO UNIFORMA
+        //DISTRIBUIÇÃO UNIFORME
         var maior;
         var menor;
         var interrogacao;
@@ -1154,12 +1169,71 @@
             insert += "Variancia: " + varianca + "<br>";
             insert += "Desvio Padrão: " + dp + "<br>";
             insert += "CV: " + cv + "<br>";
-            interrogacao = parseFloat(document.getElementById("du_interrogacao").value);
 
-            var prob = ((1 / (maior - menor)) * interrogacao);
-            insert += "Probabilidade: " + prob + "<br>";
+            var tipo = "";
+            $('input:radio[name=du_radio]').each(function() {
+                //Verifica qual está selecionado
+                if ($(this).is(':checked'))
+                    tipo = parseInt($(this).val());
+            });
 
+            var maiorQ = parseFloat(document.getElementById("du_maiorQ").value);
+            var menorQ = parseFloat(document.getElementById("du_menorQ").value);
+
+            if (tipo == 0) {
+                //maior que
+                interrogacao = maior - maiorQ;
+            } else if (tipo == 1) {
+                //menor que
+                interrogacao = menorQ - menor;
+            } else if (tipo == 2) {
+                //entre
+                interrogacao = menorQ - maiorQ;
+            }
+
+            insert += "Interrogação: " + interrogacao + "<br>";
+            prob = ((1 / (maior - menor)) * interrogacao);
+
+            insert += "Probabilidade: " + prob;
             document.getElementById("resultadoDU").innerHTML = insert;
+        }
+
+        //graficos
+        function montaGraficoDiscreta() {
+            //monta dados do grafico
+            var titles = new Array();
+            var datas = new Array();
+            for (var i = 0; i < v_tabelaDiscreta.length; i++) {
+                titles.push(v_tabelaDiscreta[i][0]);
+                datas.push(v_tabelaDiscreta[i][2]);
+            }
+            //monta grafico
+            var barChartData = {
+                labels: titles,
+                datasets: [{
+                    label: 'Dataset 1',
+                    borderWidth: 1,
+                    data: datas,
+                    backgroundColor: fillPatern
+                }]
+            };
+
+            //monta na tela
+            var ctx = document.getElementById("canvasDiscreta").getContext("2d");
+            window.myBar = new Chart(ctx, {
+                type: 'bar',
+                data: barChartData,
+                options: {
+                    responsive: true,
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Chart.js Bar Chart'
+                    }
+                }
+            });
 
 
         }
