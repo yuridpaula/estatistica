@@ -5,20 +5,21 @@
     <title></title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="css/sweetalert.css">
+    <!--<link href="css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/sweetalert.css">-->
+    <link type="text/css" rel="stylesheet" href="css/materialize.min.css" media="screen,projection" />
 
 
     <script src="js/jquery.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/sweetalert.min.js"></script>
     <script src="js/fu.js"></script>
-    <script src="js/Chart/samples/utils.js"></script>
-    <script src="js/Chart/dist/Chart.bundle.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/Chart.bundle.js"></script>
 
 
     <script>
-        var color = Chart.helpers.color;
+        //var color = Chart.helpers.color;
         v_populacao = 0;
         v_erro = 0;
         v_amostra = 0;
@@ -35,6 +36,8 @@
         v_sistematica = new Array();
         v_tabelaDiscreta = new Array();
         v_tabelaContinua = new Array();
+
+        var a, b, result;
     </script>
     <style>
         .painel {
@@ -50,418 +53,619 @@
             font-size: 10px;
             font-weight: bold;
         }
+        
+        .modal {
+            width: 90%;
+            max-height: 90%;
+        }
     </style>
 </head>
 
-<body class="container painel">
-    <h1 class="text-center">Processos Estatisticos</h1>
+<body>
 
-    <div class="painel">
-        <!--painel principal!-->
-        <h2 class="text-center">Definição de Amostras</h2>
+
+
+    <div id="container" style="width: 75%; display: none">
+        <canvas id="canvas_bar_simples"></canvas>
+    </div>
+
+    <div style="width: 75%; display: none">
+        <canvas id="canvas_bar_stacked"></canvas>
+    </div>
+
+    <div style="width: 75%; display: none">
+        <canvas id="canvas_bar_bubble"></canvas>
+    </div>
+
+
+
+
+    <div class="row">
+        <div class="col s12 m12">
+            <div class="card  blue darken-3">
+                <div class="card-content white-text">
+                    <h1 class="text-center">Processos Estatisticos</h1>
+                    <h5 align="right">Estatistica - Maria Luísa Cervi Uzun</h5>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="container">
         <div class="row">
-            <div class="col-lg-5">
-                <div class="input-group">
-                    <span class="input-group-addon" id="basic-addon1">População</span>
-                    <input type="text" class="form-control" placeholder="Insira um valor aqui: " id="populacao" aria-describedby="basic-addon1" onblur="setPopulacao()" onkeyup="validaEntrada(this)">
+            <div class="col s4 m4">
+                <div class="card blue-grey darken-1">
+                    <div class="card-content white-text">
+                        <span class="card-title">Definição de Amostra</span>
+                        <!--<p>I am a very simple card. I am good at containing small bits of information.
+              I am convenient because I require little markup to use effectively.</p>-->
+                    </div>
+                    <div class="card-action">
+                        <a href="#definicao_amostra">Acesse Aqui</a>
+                    </div>
                 </div>
             </div>
-            <div class="col-lg-5">
-                <div class="input-group">
-                    <span class="input-group-addon" id="basic-addon1">Erro</span>
-                    <input type="text" class="form-control" placeholder="Insira um valor aqui:" id="erro" aria-describedby="basic-addon1" onblur="setErro()" onkeyup="validaEntrada(this)">
+
+
+            <div class="col s4 m4">
+                <div class="card blue-grey darken-1">
+                    <div class="card-content white-text">
+                        <span class="card-title">Variável Quantitativa</span>
+                        <!--<p>I am a very simple card. I am good at containing small bits of information.
+              I am convenient because I require little markup to use effectively.</p>-->
+                    </div>
+                    <div class="card-action">
+                        <a href="#variavel_quantitativa">Acesse Aqui</a>
+                    </div>
                 </div>
             </div>
+
+            <div class="col s4 m4">
+                <div class="card blue-grey darken-1">
+                    <div class="card-content white-text">
+                        <span class="card-title">Distribuição Normal</span>
+                        <!--<p>I am a very simple card. I am good at containing small bits of information.
+              I am convenient because I require little markup to use effectively.</p>-->
+                    </div>
+                    <div class="card-action">
+                        <a href="#distribuicao_normal">Acesse Aqui</a>
+                    </div>
+                </div>
+            </div>
+
+
         </div>
 
         <div class="row">
-            <div class="col-lg-5">
-                <p class='aviso'>*Atenção! utilizar .(ponto) como separador decimal</p>
+            <div class="col s4 m4">
+                <div class="card blue-grey darken-1">
+                    <div class="card-content white-text">
+                        <span class="card-title">Distribuição Binomial</span>
+                        <!--<p>I am a very simple card. I am good at containing small bits of information.
+              I am convenient because I require little markup to use effectively.</p>-->
+                    </div>
+                    <div class="card-action">
+                        <a href="#distribuicao_binomial">Acesse Aqui</a>
+                    </div>
+                </div>
             </div>
-            <div class="col-lg-4">
-                <p class='aviso'>*Atenção! utilizar .(ponto) como separador decimal</p>
+
+
+            <div class="col s4 m4">
+                <div class="card blue-grey darken-1">
+                    <div class="card-content white-text">
+                        <span class="card-title">Distribuição Poisson</span>
+                        <!--<p>I am a very simple card. I am good at containing small bits of information.
+              I am convenient because I require little markup to use effectively.</p>-->
+                    </div>
+                    <div class="card-action">
+                        <a href="#distribuicao_poisson">Acesse Aqui</a>
+                    </div>
+                </div>
             </div>
-            <br>
+
+            <div class="col s4 m4">
+                <div class="card blue-grey darken-1">
+                    <div class="card-content white-text">
+                        <span class="card-title">Intervalo de Confiança</span>
+                        <!--<p>I am a very simple card. I am good at containing small bits of information.
+              I am convenient because I require little markup to use effectively.</p>-->
+                    </div>
+                    <div class="card-action">
+                        <a href="#intervalo_confianca1">Acesse Aqui</a>
+                    </div>
+                </div>
+            </div>
+
+
         </div>
 
-        <div class="painel">
-            <!--painel amostra!-->
-            <button type="button" class="btn btn-info btn-block" id="btnAmostra" data-target="#collapseAmostra">Calcular Amostra</button>
-            <div class="row"><br></div>
-            <div id='collapseAmostra' class="collapse">
-                <div class='row'>
-                    <div class='col-lg-1'></div>
-                    <div class='col-lg-4'>
-                        <div class='input-group'>
-                            <span class='input-group-addon' id='basic-addon1'>Quantidade de Amostra:</span>
-                            <input type='text' class='form-control' id='Amostra' aria-describedby='basic-addon1'>
-                        </div>
+        <div class="row">
+            <div class="col s4 m4">
+                <div class="card blue-grey darken-1">
+                    <div class="card-content white-text">
+                        <span class="card-title">Distribuição Uniforme</span>
+                        <!--<p>I am a very simple card. I am good at containing small bits of information.
+              I am convenient because I require little markup to use effectively.</p>-->
                     </div>
-                </div>
-
-                <div class='row'><br></div>
-
-                <div class="painel">
-                    <!--apeatoria simples!-->
-                    <div class='row'>
-                        <div class='col-lg-1'></div>
-                        <div class='col-lg-10'>
-                            <div>
-                                <button type="button" class="btn btn-info btn-block" data-toggle="collapse" data-target="#collapseAleatoriaSimples" onclick="getAleatoriaSimples()">Aleatoria Simples</button>
-                            </div>
-                        </div>
+                    <div class="card-action">
+                        <a href="#distribuicao_uniforme">Acesse Aqui</a>
                     </div>
-
-                    <div id="collapseAleatoriaSimples" class="collapse">
-                        <div class='row'>
-                            <div class='col-lg-1'></div>
-                            <div class='col-lg-10' id='AleatoriaSimples'></div>
-                        </div>
-                    </div>
-                    <!--fecha aleatoria simples!-->
-                </div>
-
-                <div class='row'> <br></div>
-
-
-                <div class="painel">
-                    <!--Sistematica-->
-
-                    <div class='row'>
-                        <div class='col-lg-1'></div>
-                        <div class='col-lg-10'>
-                            <div>
-                                <button type='button' class='btn btn-info btn-sm btn-block' data-toggle="collapse" data-target="#collapseSistematica" onclick='getSistematica()'> Sistematica</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="collapseSistematica" class="collapse">
-                        <div class='row'>
-                            <div class='col-lg-1'></div>
-                            <div class='col-lg-10' id='Sistematica'></div>
-                        </div>
-                    </div>
-                    <!-- fecha sistematicaSistematica-->
-                </div>
-
-                <div class='row'> <br></div>
-
-                <div class="painel">
-                    <!--Extratificada Proporcional-->
-
-                    <div class='row'>
-                        <div class='col-lg-1'></div>
-                        <div class='col-lg-10'>
-                            <div>
-                                <button type='button' class='btn btn-info btn-sm btn-block' data-toggle="collapse" data-target="#collapseExtratificada"> Extratificada Porporcional</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="collapseExtratificada" class="collapse">
-
-                        <div class='row'>
-                            <div class='col-lg-1'></div>
-                            <div class='col-lg-10' id='Sistematica'></div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-lg-1"></div>
-                            <div class="col-lg-11" id="amostras"></div>
-                        </div>
-                        <div class="row"><br></div>
-
-                        <div class="col-lg-10">
-                            <div class="col-lg-1"></div>
-                            <div class="col-lg-5">
-                                <div class="input-group">
-                                    <input type="text" class="form-control" placeholder="Insira um valor aqui:" id="valorExtrato" onblur="setValorExtrato()" onkeyup="validaEntrada(this)">
-                                    <span class="input-group-btn">
-                    <button class="btn btn-primary" type="button" onclick="addValorExtrato()">Adicionar Extrato</button>
-                </span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-10">
-                            <div class="col-lg-1"></div>
-                            <div class="col-lg-11">
-                                <div class="input-group">
-                                    <span class="input-group-addon" id="basic-addon1">Valores Extratos</span>
-                                    <input type="text" class="form-control" placeholder="Insira valores aqui, separados por ;(ponto e virgula)" id="valoresExtrato" aria-describedby="basic-addon1" onblur="setValoresExtrato()" onkeyup="validaEntrada(this)">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-10">
-                            <div class="col-lg-1"></div>
-                            <div class="col-lg-5">
-                                <p class='aviso'>*Atenção! utilizar .(ponto) como separador decimal</p>
-                            </div>
-                            <br>
-                        </div>
-
-                        <div class="row"><br></div>
-
-                        <div class="painel">
-                            <!--tabela extratificada!-->
-
-                            <div class='row'>
-                                <div class='col-lg-1'></div>
-                                <div class='col-lg-10'>
-                                    <div>
-                                        <button type='button' class='btn btn-info btn-sm btn-block' id="btnExtrat" data-target="#collapseTabExtratificada"> Tabela Extratificada Porporcional</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="collapseTabExtratificada" class="collapse">
-                                <div class='row'>
-                                    <div class="col-lg-10">
-                                        <div class="col-lg-1"></div>
-                                        <div class="col-lg-6" id="ExtratificadaProp"></div>
-                                    </div>
-                                </div>
-
-                            </div>
-                            <!--tabela extratificada!-->
-                        </div>
-                    </div>
-                    <!--fecha extratificada prop!-->
                 </div>
             </div>
 
-            <div class="row"><br></div>
-            <!--fecha painel amostra!-->
+
+            <div class="col s4 m4">
+                <div class="card blue-grey darken-1">
+                    <div class="card-content white-text">
+                        <span class="card-title">Correlação/Regressão</span>
+                        <!--<p>I am a very simple card. I am good at containing small bits of information.
+              I am convenient because I require little markup to use effectively.</p>-->
+                    </div>
+                    <div class="card-action">
+                        <a href="#correlacao_regressao">Acesse Aqui</a>
+                    </div>
+                </div>
+            </div>
+
+
+
         </div>
-
-        <div class="row"><br></div>
-
-        <div class="painel">
-            <!--painel variavel quantitativa-->
-            <h2 class="text-center">Variável Quantitativa</h2>
-
-            <div class="row"><br></div>
-
-            <div class="row">
-                <div class="col-lg-5">
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Insira um valor aqui:" id="valor" onblur="setValor()" onkeyup="validaEntrada(this)">
-                        <span class="input-group-btn">
-                    <button class="btn btn-primary" type="button" onclick="addValor()">Adicionar valor de Variavel</button>
-                </span>
-                    </div>
+    </div>
+    <div class="row">
+        <div class="col s12 m12">
+            <div class="card  blue darken-3">
+                <div class="card-content white-text">
+                    <h5>Alunos</h5> André Luis Firmino <br> Andressa Domenegueti <br> Yuri Oliveira de Paula
                 </div>
-                <div class 'radio' style="display: inline"><label> <input type="radio" id="rdPopulacao" name="optradio" checked> População</label></div>
-                <div class 'radio' style="display: inline"><label> <input type="radio" name="optradio"> Amostra</label></div>
 
             </div>
-
+        </div>
+    </div>
+    <div id="definicao_amostra" class="modal">
+        <div class="modal-content">
+            <h4 class="text-center">Definição de Amostras</h4>
             <div class="row">
-                <div class="col-lg-12">
-                    <div class="input-group">
-                        <span class="input-group-addon" id="basic-addon1">Valores</span>
-                        <input type="text" class="form-control" placeholder="Insira valores aqui, separados por ;(ponto e virgula)" id="valores" aria-describedby="basic-addon1" onblur="setValores()" onkeyup="validaEntrada(this)">
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-lg-5">
+                <div class="input-field col s3">
+                    <label>População</label>
+                    <input type="text" class="form-control" id="populacao" aria-describedby="basic-addon1" onblur="setPopulacao()" onkeyup="validaEntrada(this)">
                     <p class='aviso'>*Atenção! utilizar .(ponto) como separador decimal</p>
                 </div>
-                <br></div>
+                <div class="input-field col s3">
+                    <label>Erro</label>
+                    <input type="text" class="form-control" id="erro" aria-describedby="basic-addon1" onblur="setErro()" onkeyup="validaEntrada(this)">
+                    <p class='aviso'>*Atenção! utilizar .(ponto) como separador decimal</p>
+                </div>
+            </div>
 
-
-            <div class="painel">
+            <ul class="collapsible" data-collapsible="accordion">
                 <!--painel discreta-->
-                <button type="button" class='btn btn-info btn-sm btn-block' data-target="#collapseDiscreta" data-toggle="collapse"> Dados Discreta</button>
-                <div id="collapseDiscreta" class="collapse">
+                <li>
+                    <div class="btn collapsible-header blue-grey darken-1 white-text" id="btnAmostra">Calcular Amostra</div>
+                    <div class="collapsible-body">
 
-                    <div class='row'><br></div>
+                        <label>Quantidade de Amostra</label>
+                        <input type='text' class='form-control' id='Amostra' aria-describedby='basic-addon1'>
 
-                    <div class='row'>
-                        <div class='col-lg-1'></div>
-                        <div class="col-lg-10">
-                            <button type='button' class='btn btn-primary' id="btnD2"> Tabela</button>
-                            <button type='button' class='btn btn-primary' onclick="montaValoresD()"> Valores</button>
-                            <button type='button' class='btn btn-primary' onclick="montaModaD()"> Moda</button>
-                            <button type='button' class='btn btn-primary' onclick="montaDesvioD()"> Desvio Padrão</button>
-                            <button type='button' class='btn btn-primary' onclick="montaGraficoDiscreta()"> Gráfico</button>
-                        </div>
+                        <ul class="collapsible" data-collapsible="accordion">
+                            <li>
+                                <div class="btn collapsible-header blue-grey darken-1 white-text" id="btnAmostra" onclick="getAleatoriaSimples()">Aleatória Simples</div>
+                                <div class="collapsible-body">
+                                    <div id='AleatoriaSimples'></div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="btn collapsible-header blue-grey darken-1 white-text" id="btnAmostra" onclick='getSistematica()'>Sistemática</div>
+                                <div class="collapsible-body">
+                                    <div id='Sistematica'></div>
+                                </div>
+                            </li>
+                            <li>
+
+                                <div class="btn collapsible-header blue-grey darken-1 white-text" id="btnAmostra">Extratificada Proporcional</div>
+                                <div class="collapsible-body">
+                                    <ul class="collapsible" data-collapsible="accordion">
+                                        <li>
+                                            <div id='Sistematica'></div>
+                                            <br>
+                                            <div id="amostras"></div>
+                                            <br>
+                                            <div class="row">
+                                                <div class="input-field col s3">
+                                                    <label>Adicionar Extrato</label>
+                                                    <input type="text" class="form-control" id="valorExtrato" onblur="setValorExtrato()" onkeyup="validaEntrada(this)">
+                                                </div>
+                                                <div class="input-field col s3">
+                                                    <button class="btn btn-primary" type="button" onclick="addValorExtrato()">Adicionar Extrato</button>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="input-field col s7">
+                                                    <label>Valores Extrato</label>
+                                                    <input type="text" class="form-control" id="valoresExtrato" onblur="setValoresExtrato()" onkeyup="validaEntrada(this)">
+                                                </div>
+                                                <br>
+                                                <p class='aviso'>*Atenção! utilizar .(ponto) como separador decimal</p>
+                                            </div>
+                                            <li>
+                                                <ul class="collapsible" data-collapsible="accordion">
+                                                    <li>
+                                                        <div class="btn collapsible-header blue-grey darken-1 white-text" id="btnExtrat">Tabela Extratificada Proporcional</div>
+                                                        <div class="collapsible-body">
+                                                            <div id="ExtratificadaProp"></div>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                </div>
+                                </li>
+
+
+
+                                </ul>
+                            </li>
+
+
+
+                        </ul>
+
                     </div>
-                    <div class='row'>
-                        <div class='col-lg-1'></div>
-                        <div class='col-lg-10' id='tabelaDiscreta'></div>
-                        <canvas id="canvasDiscreta"></canvas>
-
-                    </div>
-
-                </div>
-                <!-- fecha painel discreta-->
+                </li>
+            </ul>
+            <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close waves-effect waves-green btn red darken-2">Fechar</a>
             </div>
 
-            <div class="row"><br></div>
-
-            <div class="painel">
-                <!--painel continua-->
-                <button type='button' class='btn btn-info btn-sm btn-block' data-target="#collapseContinua" data-toggle="collapse"> Dados Continua</button>
-                <div id="collapseContinua" class="collapse">
-
-                    <div class='row'><br></div>
-
-                    <div class='row'>
-                        <div class='col-lg-1'></div>
-                        <div class="col-lg-10">
-                            <button type='button' class='btn btn-primary' id="btnC2"> Tabela</button>
-                            <button type='button' class='btn btn-primary' onclick="montaValoresC()"> Valores</button>
-                            <button type='button' class='btn btn-primary' onclick="montaModaC()"> Moda</button>
-                            <button type='button' class='btn btn-primary' onclick="montaDesvioC()"> Desvio Padrão</button>
-                        </div>
-                    </div>
-                    <div class='row'>
-                        <div class='col-lg-1'></div>
-                        <div class='col-lg-10' id='tabelaContinua'></div>
-                    </div>
-
-                </div>
-                <!--fecha painel continua-->
-            </div>
-            <!--fecha painel variavel quantitativa-->
         </div>
-        <!-- fecha painel principal!-->
+
+
+
+        <div id="variavel_quantitativa" class="modal">
+            <div class="modal-content">
+                <!--painel variavel quantitativa-->
+                <h4 align="center">Variável Quantitativa</h4>
+
+                <div class="row">
+                    <div class="input-field col s2">
+                        <label>Insira um valor </label>
+                        <input type="text" class="form-control" id="valor" onblur="setValor()" onkeyup="validaEntrada(this)">
+                    </div>
+                    <div class="input-field col s2">
+                        <button class="btn btn-primary" type="button" onclick="addValor()">Adicionar valor de Variavel</button>
+                    </div>
+                    <div class="input-field col s4">
+                        <input class="with-gap" type="radio" id="rdPopulacao" name="optradio" checked><label for="rdPopulacao">População</label>
+                        <input class="with-gap" type="radio" id="rdAmostra" name="optradio"><label for="rdAmostra">Amostra</label>
+                    </div>
+                </div>
+
+
+
+                <div class="row">
+                    <div class="input-field col s12">
+                        <div class="input-group">
+                            <label>Valores <span> <b>Insira valores aqui, separados por ;(ponto e virgula)</b></span></label>
+                            <input type="text" class="form-control" id="valores" aria-describedby="basic-addon1" onblur="setValores()" onkeyup="validaEntrada(this)">
+                        </div>
+                        <p class='aviso'>*Atenção! utilizar .(ponto) como separador decimal</p>
+                    </div>
+                </div>
+
+
+
+                <ul class="collapsible" data-collapsible="accordion">
+                    <!--painel discreta-->
+                    <li>
+                        <div class="collapsible-header blue-grey darken-1 white-text">Dados Discreta</div>
+                        <div class="collapsible-body">
+                            <div class='row'>
+                                <div class='col-lg-1'></div>
+                                <div class="col-lg-10">
+                                    <button type='button' class='btn btn-primary' id="btnD2"> Tabela</button>
+                                    <button type='button' class='btn btn-primary' onclick="montaValoresD()"> Valores</button>
+                                    <button type='button' class='btn btn-primary' onclick="montaModaD()"> Moda</button>
+                                    <button type='button' class='btn btn-primary' onclick="montaDesvioD()"> Desvio Padrão</button>
+                                    <button type='button' class='btn btn-primary' onclick="montaGraficoDiscreta()"> Gráfico</button>
+                                </div>
+                            </div>
+                            <div class='row'>
+                                <div class='col-lg-1'></div>
+                                <div class='col-lg-10' id='tabelaDiscreta'></div>
+                                <canvas id="canvasDiscreta"></canvas>
+                            </div>
+                        </div>
+                    </li>
+                    <!--painel continua-->
+                    <li>
+                        <div class="collapsible-header blue-grey darken-1 white-text">Dados Continua</div>
+                        <div class="collapsible-body">
+                            <div class='row'>
+                                <div class='col-lg-1'></div>
+                                <div class="col-lg-10">
+                                    <button type='button' class='btn' id="btnC2"> Tabela</button>
+                                    <button type='button' class='btn' onclick="montaValoresC()"> Valores</button>
+                                    <button type='button' class='btn' onclick="montaModaC()"> Moda</button>
+                                    <button type='button' class='btn' onclick="montaDesvioC()"> Desvio Padrão</button>
+                                    <button type='button' class='btn btn-primary' onclick="montaGraficoContinua()"> Gráfico</button>
+                                </div>
+                            </div>
+                            <div class='row'>
+                                <div class='col-lg-1'></div>
+                                <div class='col-lg-10' id='tabelaContinua'></div>
+                                <canvas id="canvasContinua"></canvas>
+                            </div>
+                        </div>
+
+                </ul>
+
+
+                <div class="modal-footer">
+                    <a href="#!" class="modal-action modal-close waves-effect waves-green btn red darken-2">Fechar</a>
+                </div>
+
+
+
+            </div>
+        </div>
+
+
+        <!-- Lista 5 -->
+
+        <div id="distribuicao_normal" class="modal">
+            <div class="modal-content">
+                <div class="row"><br></div>
+                <h4 align="center">Distribuição Normal</h4>
+                <br>
+                <div class="row">
+                    <div class="input-field col s3">
+                        <label>Media: </label>
+                        <input type="text" name="media" placeholder="Media" id="dn_media">
+                    </div>
+                    <div class="input-field col s3">
+                        <label>Desvio Padrão: </label>
+                        <input type="text" name="desviopadrao" placeholder="Desvio Padrão" id="dn_desvio_padrao">
+                    </div>
+                    <div class="input-field col s3">
+                        <label>Maior que : </label>
+                        <input type="text" name="maiorque" placeholder="Maior que" id="dn_maior">
+                    </div>
+                    <div class="input-field col s3">
+                        <label>Menor que : </label>
+                        <input type="text" name="menorque" placeholder="Menor que" id="dn_menor">
+                    </div>
+                </div>
+                <input type="radio" id="radiodn_0" name="dn_radio" value="0" class="with-gap"><label for="radiodn_0"> Maior</label>
+                <input type="radio" id="radiodn_1" name="dn_radio" value="1" class="with-gap"><label for="radiodn_1"> Menor</label>
+                <input type="radio" id="radiodn_2" name="dn_radio" value="2" class="with-gap"><label for="radiodn_2"> Entre</label>
+                <br><br>
+
+
+                <button class="btn green darken-3" onclick="calculaDistribuicaoNormal()">Calcular</button>
+                <br><br>
+                <div class="card blue-grey darken-1">
+                    <div class="card-content white-text">
+                        <span class="card-title">Resposta</span>
+                        <p>
+                            <div id="resultadoDN"></div>
+                        </p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="#!" class="modal-action modal-close waves-effect waves-green btn red darken-2">Fechar</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista 6-->
+        <div id="distribuicao_binomial" class="modal">
+            <div class="modal-content">
+                <div class="row"><br></div>
+
+                <h4 align="center">Distribuição Binomial</h4>
+                <br>
+                <div class="row">
+                    <div class="input-field col s3">
+                        <label>Sucesso(p): </label>
+                        <input type="text" name="p" id="db_p">
+                    </div>
+                    <div class="input-field col s3">
+                        <label>Evento(k): </label>
+                        <input type="text" name="k" id="db_k">
+                    </div>
+                    <div class="input-field col s3">
+                        <label>Fracasso(q): </label>
+                        <input type="text" name="q" id="db_q">
+                    </div>
+                    <div class="input-field col s3">
+                        <label>Tamanho da Amostra(n): </label>
+                        <input type="text" name="n" id="db_n">
+                    </div>
+                    <br>
+                    <button class="btn green darken-3" onclick="calculaDistribuicaoBinomial()">Calcular</button>
+                    <br><br>
+                    <div class="card blue-grey darken-1">
+                        <div class="card-content white-text">
+                            <span class="card-title">Resposta</span>
+                            <p>
+                                <div id="resultadoBn"></div>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="#!" class="modal-action modal-close waves-effect waves-green btn red darken-2">Fechar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista 7-->
+        <div id="distribuicao_poisson" class="modal">
+            <div class="modal-content">
+                <h4 align="center">Distribuição Poisson</h4>
+                <br>
+                <div class="row">
+                    <div class="input-field col s2">
+                        <label>NI</label>
+                        <input type="text" name="ni" id="dp_ni">
+                    </div>
+                    <div class="input-field col s2">
+                        <label>X</label>
+                        <input type="text" name="x" id="dp_x">
+                    </div>
+                </div>
+                <input class="with-gap" type="radio" name="dp_radio" id="dp_tipo_0" value="0"><label for="dp_tipo_0">Valor Especifico</label>
+                <input class="with-gap" type="radio" name="dp_radio" id="dp_tipo_1" value="1"><label for="dp_tipo_1">0 - Até Valor Especifico</label>
+                <br><br>
+                <button class="btn green darken-3" onclick="calculaDistribuicaoPoisson()">Calcular</button>
+                <br><br>
+                <div class="card blue-grey darken-1">
+                    <div class="card-content white-text">
+                        <span class="card-title">Resposta</span>
+                        <p>
+                            <div id="resultadoDP"></div>
+                        </p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="#!" class="modal-action modal-close waves-effect waves-green btn red darken-2">Fechar</a>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Lista 8 -->
+        <div id="intervalo_confianca1" class="modal">
+            <div class="modal-content">
+                <h4 align="center">Intervalo de Confiança</h4>
+                <br>
+                <div class="row">
+                    <div class="input-field col s2">
+                        <label>População</label>
+                        <input type="text" name="populacao" id="ic_populacao">
+                    </div>
+                    <div class="input-field col s2">
+                        <label>População Total</label>
+                        <input type="text" name="populacao_total" id="ic_populacao_total">
+                    </div>
+                    <div class="input-field col s2">
+                        <label>Média</label>
+                        <input type="text" name="media" id="ic_media">
+                    </div>
+                    <div class="input-field col s2">
+                        <label>Desvio Padrão</label>
+                        <input type="text" name="desvio_padrao" id="ic_desvio_padrao">
+                    </div>
+                    <div class="input-field col s2">
+                        <label>Intervalo de Confiança</label>
+                        <input type="text" name="intervalo_confianca" id="ic_intervalo">
+                    </div>
+                </div>
+                <button class="btn green darken-3" onclick="calculaIntervaloConfianca()">Calcular</button>
+                <br><br>
+                <div class="card blue-grey darken-1">
+                    <div class="card-content white-text">
+                        <span class="card-title">Resposta</span>
+                        <p>
+                            <div id="resultadoIC"></div>
+                        </p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="#!" class="modal-action modal-close waves-effect waves-green btn red darken-2">Fechar</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista 9 -->
+        <div id="distribuicao_uniforme" class="modal">
+            <div class="modal-content">
+                <div class="row"><br></div>
+                <h4 align="center">Distribuição Uniforme</h2>
+                    <br>
+                    <div class="row">
+                        <div class="input-field col s3">
+                            <label>Menor</label>
+                            <input type="text" id="du_menor">
+                        </div>
+                        <div class="input-field col s3">
+                            <label>Maior</label>
+                            <input type="text" id="du_maior">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field col s3">
+                            <label>Menor que</label>
+                            <input type="text" name="menorque2" id="du_menorQ">
+                        </div>
+                        <div class="input-field col s3">
+                            <label>Maior que</label>
+                            <input type="text" name="maiorque2" id="du_maiorQ">
+                        </div>
+                    </div>
+                    <input class="with-gap" type="radio" id="du_radio_0" name="du_radio" value="0"><label for="du_radio_0">Maior</label>
+                    <input class="with-gap" type="radio" id="du_radio_1" name="du_radio" value="1"><label for="du_radio_1">Menor</label>
+                    <input class="with-gap" type="radio" id="du_radio_2" name="du_radio" value="2"><label for="du_radio_2">Entre</label>
+                    <br>
+
+                    <br>
+                    <button class="btn green darken-3" onclick="calcularDistribuicaoUniforme()">Calcular</button>
+                    <br><br>
+                    <div id="resultadolista9"></div>
+                    <div class="card blue-grey darken-1">
+                        <div class="card-content white-text">
+                            <span class="card-title">Resposta</span>
+                            <p>
+                                <div id="resultadoDU"></div>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="#!" class="modal-action modal-close waves-effect waves-green btn red darken-2">Fechar</a>
+                    </div>
+
+            </div>
+        </div>
+
+        <!-- Lista 10 -->
+        <div id="correlacao_regressao" class="modal">
+            <div class="modal-content">
+
+                <h4 align="center">Correlação / Regressão</h4>
+                <br>
+                <div class="row">
+                    <div class="input-field col s1">
+                        <label>X</label>
+                        <input type="text" name="X" id="cr_x">
+                    </div>
+                    <div class="input-field col s1">
+                        <label>Y</label>
+                        <input type="text" name="Y" id="cr_y">
+                    </div>
+                    <div class="col s3">
+                        <br>
+                        <button class="btn" onclick="pushRow()">Adicionar na Tabela</button>
+                    </div>
+                </div>
+
+                <br>
+                <button class="btn green darken-3" onclick="calcularCorrelacao()">Calcular</button>
+                <button class="btn green darken-3" onclick="graficoCorrelacao()">Gerar Gráfico</button>
+                <br><br>
+                <div class="card ">
+                    <div class="card-content">
+                        <span class="card-title">Resposta</span>
+                        <p>
+                            <div id="resultadoCR"></div>
+                        </p>
+                    </div>
+                </div>
+                <canvas id="canvasCorrelacao"></canvas>
+            </div>
+            <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close waves-effect waves-green btn red darken-2">Fechar</a>
+            </div>
+        </div>
     </div>
-    <!-- Lista 5 -->
-    <div class="row"><br></div>
-    <div class="painel">
-        <h2 align="center">Distribuição Normal - Lista 5</h2>
-        <br>
-        <label>Media: </label>
-        <input type="text" name="media" placeholder="Media" id="dn_media">
-        <br>
-        <label>Desvio Padrão: </label>
-        <input type="text" name="desviopadrao" placeholder="Desvio Padrão" id="dn_desvio_padrao">
-        <br>
-        <label>Maior que : </label>
-        <input type="text" name="maiorque" placeholder="Maior que" id="dn_maior">
-        <label>Menor que : </label>
-        <input type="text" name="menorque" placeholder="Menor que" id="dn_menor">
-        <br>
-        <input type="radio" id="dn_radio" name="dn_radio" value="0"> Maior
-        <input type="radio" id="dn_radio" name="dn_radio" value="1"> Menor
-        <input type="radio" id="dn_radio" name="dn_radio" value="2"> Entre
-        <br>
-        <button onclick="calculaDistribuicaoNormal()">Calcular</button>
-        <div id="resultadoDN"></div>
-    </div>
-
-    <!-- Lista 6-->
-    <div class="row"><br></div>
-    <div class="painel">
-        <h2 align="center">Distribuição Binomial - Lista 6</h2>
-        <br>
-        <label>Sucesso(p): </label>
-        <input type="text" name="p" id="db_p">
-        <br>
-        <label>Evento(k): </label>
-        <input type="text" name="k" id="db_k">
-        <br>
-        <label>Fracasso(q): </label>
-        <input type="text" name="q" id="db_q">
-        <br>
-        <label>Tamanho da Amostra(n): </label>
-        <input type="text" name="n" id="db_n">
-        <br>
-        <button onclick="calculaDistribuicaoBinomial()">Calcular</button>
-        <div id="resultadoBn"></div>
-    </div>
-
-    <!-- Lista 7-->
-
-    <div class="row"><br></div>
-    <div class="painel">
-        <h2 align="center">Distribuição Poisson - Lista 7</h2>
-        <br>
-        <label>NI</label>
-        <input type="text" name="ni" placeholder="NI" id="dp_ni">
-        <br>
-        <label>X</label>
-        <input type="text" name="x" placeholder="X" id="dp_x">
-        <br>
-        <input type="radio" name="dp_radio" id="dp_tipo" value="0">Valor Especifico
-        <input type="radio" name="dp_radio" id="dp_tipo" value="1">0 - Até Valor Especifico
-        <br>
-        <button onclick="calculaDistribuicaoPoisson()">Calcular</button>
-        <div id="resultadoDP"></div>
-    </div>
-
-    <!-- Lista 8 -->
-
-    <div class="row"><br></div>
-    <div class="painel">
-        <h2 align="center">Intervalo de Confiança - Lista 8</h2>
-        <br>
-        <label>População</label>
-        <input type="text" name="populacao" id="ic_populacao">
-        <br>
-        <label>População Total</label>
-        <input type="text" name="populacao_total" id="ic_populacao_total">
-        <br>
-        <label>Média</label>
-        <input type="text" name="media" id="ic_media">
-        <br>
-        <label>Desvio Padrão</label>
-        <input type="text" name="desvio_padrao" id="ic_desvio_padrao">
-        <br>
-        <label>Intervalo de Confiança</label>
-        <input type="text" name="intervalo_confianca" id="ic_intervalo">
-
-        <button onclick="calculaIntervaloConfianca()">Calcular</button>
-        <div id="resultadoIC"></div>
-    </div>
-
-    <!-- Lista 9 -->
-
-    <div class="row"><br></div>
-    <div class="painel">
-        <h2 align="center">Distribuição Uniforme - Lista 9</h2>
-        <br>
-        <label>Menor</label>
-        <input type="text" placeholder="Menor" id="du_menor">
-        <br>
-        <label>Maior</label>
-        <input type="text" placeholder="Maior" id="du_maior">
-        <br>
-
-        <label>Maior que : </label>
-        <input type="text" name="maiorque2" placeholder="Maior que" id="du_maiorQ">
-        <label>Menor que : </label>
-        <input type="text" name="menorque2" placeholder="Menor que" id="du_menorQ">
-        <br>
-        <input type="radio" id="du_radio" name="du_radio" value="0"> Maior
-        <input type="radio" id="du_radio" name="du_radio" value="1"> Menor
-        <input type="radio" id="du_radio" name="du_radio" value="2"> Entre
-        <br>
-
-        <br>
-        <button onclick="calcularDistribuicaoUniforme()">Calcular</button>
-        <div id="resultadolista9"></div>
-        <div id="resultadoDU"></div>
-
-    </div>
-
-    <!-- Lista 10 -->
-
-    <div class="row"><br></div>
-    <div class="painel">
-        <h2 align="center">Correlação / Regressão - Lista 10</h2>
-        <br>
-        <label>X</label>
-        <input type="text" name="X" id="cr_x">
-        <label>Y</label>
-        <input type="text" name="Y" id="cr_y">
-        <button onclick="pushRow()">Adicionar na Tabela</button>
-        <br>
-        <button onclick="calcularCorrelacao()">Calcular</button>
-        <div id="resultadoCR"></div>
-    </div>
-
 
     <script>
         $(function() {
@@ -478,7 +682,8 @@
 
         function getAmostra() {
             if (!(v_erro > 0) || !(v_populacao > 0)) {
-                swal("Erro", "Favor informar a População e o Erro!", "error");
+                //swal("Erro", "Favor informar a População e o Erro!", "error");
+                alert("Erro, Favor informar a População e o Erro!");
                 this.divAmostra.collapse('hide');
             } else {
                 this.divAmostra.collapse('show');
@@ -1114,6 +1319,7 @@
             return insert;
         }
 
+
         function calcularCorrelacao() {
             /*
             0 - x
@@ -1130,20 +1336,22 @@
             var primeiraParte = n * tabela[tabela.length - 1][2] - (tabela[tabela.length - 1][0] * tabela[tabela.length - 1][1]);
             var segundaParte = (n * tabela[tabela.length - 1][3] - Math.pow(tabela[tabela.length - 1][0], 2)) *
                 (n * tabela[tabela.length - 1][4] - Math.pow(tabela[tabela.length - 1][1], 2));
-            var result = primeiraParte / Math.sqrt(segundaParte);
+            result = (primeiraParte / Math.sqrt(segundaParte)).toFixed(4);
 
-            var a = ((n * tabela[tabela.length - 1][2]) - (tabela[tabela.length - 1][0] * tabela[tabela.length - 1][1])) / (n * tabela[tabela.length - 1][3] - Math.pow(tabela[tabela.length - 1][0], 2));
-            var b = (tabela[tabela.length - 1][1] / n) - a * (tabela[tabela.length - 1][0] / n);
+            a = parseFloat(((n * tabela[tabela.length - 1][2]) - (tabela[tabela.length - 1][0] * tabela[tabela.length - 1][1])) / (n * tabela[tabela.length - 1][3] - Math.pow(tabela[tabela.length - 1][0], 2))).toFixed(2);
+            b = parseFloat((tabela[tabela.length - 1][1] / n) - a * (tabela[tabela.length - 1][0] / n)).toFixed(2);
 
             var retorno = mostrarTabela();
             if (result == 0) {
                 retorno += "Não há correlação!";
             } else if (result > 0) {
+                retorno += "Resutado: " + result + "<br>";
                 retorno += "Correlação perfeita positiva <br>";
-                retorno += 'y = (' + a + ') * x + (' + b + ')';
+                retorno += 'Função: y = (' + a + ') * x + (' + b + ')';
             } else {
+                retorno += "Resutado: " + result + "<br>";
                 retorno += "Correlação perfeita negativa <br>";
-                retorno += 'y = -(' + a + ') * x + (' + b + ')';
+                retorno += 'Função: y = -(' + a + ') * x + (' + b + ')';
             }
             document.getElementById("resultadoCR").innerHTML = retorno;
         }
@@ -1192,7 +1400,7 @@
             }
 
             insert += "Interrogação: " + interrogacao + "<br>";
-            prob = ((1 / (maior - menor)) * interrogacao);
+            prob = parseFloat(((1 / (maior - menor)) * interrogacao).toFixed(2));
 
             insert += "Probabilidade: " + prob;
             document.getElementById("resultadoDU").innerHTML = insert;
@@ -1200,21 +1408,25 @@
 
         //graficos
         function montaGraficoDiscreta() {
-            //monta dados do grafico
             var titles = new Array();
             var datas = new Array();
+            var bkColors = new Array();
+            var bdColors = new Array();
             for (var i = 0; i < v_tabelaDiscreta.length; i++) {
                 titles.push(v_tabelaDiscreta[i][0]);
-                datas.push(v_tabelaDiscreta[i][2]);
+                datas.push(v_tabelaDiscreta[i][1]);
+                bkColors.push(backColors[i]);
+                bdColors.push(borderColors[i]);
             }
             //monta grafico
             var barChartData = {
                 labels: titles,
                 datasets: [{
-                    label: 'Dataset 1',
+                    label: '',
                     borderWidth: 1,
                     data: datas,
-                    backgroundColor: fillPatern
+                    backgroundColor: bkColors,
+                    borderColor: bdColors
                 }]
             };
 
@@ -1230,14 +1442,177 @@
                     },
                     title: {
                         display: true,
-                        text: 'Chart.js Bar Chart'
+                        text: 'Gráfico Variável Quantitativa Discreta'
+                    },
+                    scales: {
+                        yAxes: [{
+                            display: true,
+                            ticks: {
+                                suggestedMin: 0, // minimum will be 0, unless there is a lower value.
+                                // OR //
+                                beginAtZero: true // minimum value will be 0.
+                            }
+                        }]
                     }
+
+
                 }
             });
 
 
         }
+
+        function montaGraficoContinua() {
+            var titles = new Array();
+            var datas = new Array();
+            var bkColors = new Array();
+            var bdColors = new Array();
+
+
+            //monta grafico
+            var barChartData = {
+                datasets: [],
+                labels: []
+            };
+
+            for (var i = 0; i < v_tabelaContinua.length; i++) {
+                for (var j = 0; j < v_tabelaContinua.length; j++) {
+                    if (j < i) {
+                        datas.push(0);
+                    } else {
+                        datas.push(v_tabelaContinua[i][4]);
+                    }
+                    bkColors.push(backColors[i]);
+                    bdColors.push(borderColors[i]);
+                }
+                barChartData.datasets.push({
+                    label: 'classe ' + (i + 1),
+                    borderWidth: 1,
+                    stack: 'Stack 0',
+                    data: datas,
+                    backgroundColor: bkColors,
+                    borderColor: bdColors
+                });
+                titles.push(v_tabelaContinua[i][0]);
+                datas = [];
+                bkColors = [];
+                bdColors = [];
+            }
+            barChartData.labels = (titles);
+
+            //monta na tela
+            var ctx = document.getElementById("canvasContinua").getContext("2d");
+            window.myBar = new Chart(ctx, {
+                type: 'bar',
+                data: barChartData,
+                options: {
+                    title: {
+                        display: true,
+                        text: "Gráfico Variável Quantitativa Continua"
+                    },
+                    tooltips: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    responsive: true,
+                    scales: {
+                        xAxes: [{
+                            stacked: true,
+                        }],
+                        yAxes: [{
+                            stacked: true,
+                        }]
+                    }
+                }
+            });
+        }
+
+        function graficoCorrelacao() {
+            var datas = [];
+            var lines = [];
+            var maior = tabela[1][tabela.length - 2];
+            var menor = tabela[0][0];
+            for (var i = 0; i < tabela.length - 1; i++) {
+                datas.push({
+                    x: tabela[i][0],
+                    y: tabela[i][1],
+                    r: 10
+                });
+            }
+            var reta_min = parseFloat(b) + (parseFloat(a) * menor);
+            var reta_max = parseFloat(b) + (parseFloat(a) * maior);
+
+            lines.push({
+                x: menor,
+                y: reta_min
+            });
+            lines.push({
+                x: (tabela[tabela[0].length - 2][0]),
+                y: reta_max
+            });
+
+
+            //monta grafico
+            var myBubbleChart = {
+                datasets: [{
+                    label: 'Dispersão',
+                    data: datas,
+                    backgroundColor: backColors[3],
+                    borderColor: borderColors[3]
+                }, {
+                    label: 'Curva de Regressão',
+                    data: lines,
+                    type: 'line',
+                    fill: false,
+                    backgroundColor: backColors[4],
+                    borderColor: borderColors[4]
+                }]
+            };
+
+            //monta na tela
+            var ctx = document.getElementById("canvasCorrelacao").getContext("2d");
+            window.myBar = new Chart(ctx, {
+                type: 'bubble',
+                data: myBubbleChart,
+                options: {
+                    scales: {
+                        xAxes: [{
+                            type: 'linear',
+                            position: 'bottom',
+                        }]
+                    }
+                }
+            });
+        }
     </script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
+            $('.modal').modal();
+            $('.collapsible').collapsible();
+        });
+
+        var backColors = [
+            'rgba(255, 99, 132, 0.2)',
+            'rgba(54, 162, 235, 0.2)',
+            'rgba(255, 206, 86, 0.2)',
+            'rgba(75, 192, 192, 0.2)',
+            'rgba(153, 102, 255, 0.2)',
+            'rgba(255, 159, 64, 0.2)'
+        ];
+        var borderColors = [
+            'rgba(255,99,132,1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(153, 102, 255, 1)',
+            'rgba(255, 159, 64, 1)'
+        ];
+    </script>
+
+    <script type="text/javascript" src="js/materialize.js"></script>
+
 
 </body>
 
